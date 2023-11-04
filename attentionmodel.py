@@ -182,17 +182,18 @@ class GPT(nn.Module):
         assert t <= self.block_size, "Cannot forward, model block size is exhausted."
 
         # forward the GPT model
+        #idx : batch, seq_len
         token_embeddings = self.tok_emb(idx) # each index maps to a (learnable) vector
         position_embeddings = self.pos_emb[:, :t, :] # each position maps to a (learnable) vector
         x = self.drop(token_embeddings + position_embeddings)
-        x = self.blocks(x)
-        x = self.ln_f(x)
-        logits = self.head(x)
+        x = self.blocks(x) # n_layer transformer encoder
+        x = self.ln_f(x) #layer norm
+        logits = self.head(x) # batch, seq_len, vocab_size
 
         # if we are given some desired targets also calculate the loss
         loss = None
         if targets is not None:
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
 
-        return logits, loss
+        return logits, loss #return: next prediction, if has target and return loss
 

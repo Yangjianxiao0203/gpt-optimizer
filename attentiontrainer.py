@@ -38,6 +38,16 @@ class TrainerConfig:
             setattr(self, k, v)
 
 class Trainer:
+    '''
+    process:
+    加载数据集的时候是有标准答案的，也是前n个字预测最后一个字
+    model forward返回logits和loss
+    用loss进行训练
+    
+    然后用训练好的模型进行预测
+    logits取最后一个token
+    然后放回去，再预测下一个token, 用的是sample方法
+    '''
 
     def __init__(self, model, train_dataset, test_dataset, config):
         self.model = model
